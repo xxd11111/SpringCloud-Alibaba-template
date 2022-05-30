@@ -1,4 +1,4 @@
-package com.xxd.openFeign1.config;
+package com.xxd.openFeign1.exception;
 
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;

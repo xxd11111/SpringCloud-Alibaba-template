@@ -12,6 +12,7 @@
     <modules>
         <module>x01-nacos</module>
         <module>x02-openFeign</module>
+        <module>x03-sentinel</module>
     </modules>
 
 </project>
