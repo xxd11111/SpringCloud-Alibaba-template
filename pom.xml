@@ -11,6 +11,7 @@
 
     <modules>
         <module>x01-nacos</module>
+        <module>x02-openFeign</module>
     </modules>
 
 </project>

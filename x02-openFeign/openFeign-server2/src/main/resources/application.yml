@@ -1,0 +1,12 @@
+server:
+  port: 9204
+
+# Spring
+spring:
+  application:
+    # 应用名称
+    name: openFeign-server2
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.193.30:8848
