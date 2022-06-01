@@ -16,6 +16,12 @@ public class Demo1Controller {
     }
     @GetMapping("/test2")
     public String test2() {
-        return demoService.test2();
+        String s;
+        try {
+            s = demoService.test2();
+        }catch (Exception e){
+            s = "error";
+        }
+        return s;
     }
 }
