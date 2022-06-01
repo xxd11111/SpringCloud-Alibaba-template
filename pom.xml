@@ -13,6 +13,8 @@
         <module>x01-nacos</module>
         <module>x02-openFeign</module>
         <module>x03-sentinel</module>
+        <module>x04-GateWay</module>
+        <module>x04-GateWay/gateWay</module>
     </modules>
 
 </project>
