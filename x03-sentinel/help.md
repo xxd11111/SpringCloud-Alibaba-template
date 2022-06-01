@@ -1,72 +1,97 @@
-### sentinel容错处理
-    远程调用过程中，sneinel会限流熔断等，这时候调用方可以自己进行异常处理
+# sentinel帮助文档
+## sentinel使用
+### 环境
 ```
-服务提供方
-@RestController
-public class Demo2Controller {
+nacos-server（略，详看x01-nacos文档）
 
-    @GetMapping("/test1")
-    public String test1() {
-        return "这是服务2的接口" ;
-    }
+sentinel-dashbord 
+下载地址 https://github.com/alibaba/Sentinel/releases/download/1.8.4/sentinel-dashboard-1.8.4.jar
+输入 java -Dserver.port=8081 -Dcsp.sentinel.dashboard.server=localhost:8081 -Dproject.name=sentinel-dashboard -jar sentinel-dashboard-1.8.4.jar
+```
+### 依赖
+``` 
+            <!-- SpringCloud 微服务 -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
-    @GetMapping("/test2")
-    public String test2() throws Exception {
-        throw new Exception();
-    }
-}
+            <!-- SpringCloud Alibaba 微服务 -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- SpringBoot 依赖配置 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        </dependency>
 ```
-```
-服务调用方
+### 使用
+``` 
 @RestController
 public class Demo1Controller {
-    @Resource
-    DemoService demoService;
 
     @GetMapping("/test1")
     public String test1() {
-        return demoService.test1();
+        return "test1";
     }
-    @GetMapping("/test2")
-    public String test2() {
-        return demoService.test2();
+}
+@SpringBootApplication
+public class SentinelApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(SentinelApplication.class, args);
     }
 }
 
-@Service
-@FeignClient(name = "openFeign-server2", fallbackFactory = DemoServiceFallbackFactory.class)
-public interface DemoService {
-    //调用服务提供方的输出接口
-    @GetMapping(value = "/test1")
-    String test1();
-    @GetMapping(value = "/test2")
-    String test2();
-}
+配置文件
+server:
+  port: 9301
 
-public class DemoServiceFallback implements DemoService {
-    private Throwable throwable;
+spring:
+  application:
+    name: service-consumer
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.193.30:8848
+    sentinel:
+      transport:
+        dashboard: 192.168.193.30:8081
+        port: 8719
+        client-ip: 192.168.193.31
 
-    DemoServiceFallback(Throwable throwable) {
-        this.throwable = throwable;
-    }
-
-    @Override
-    public String test1() {
-        return "test1调用错误:" + throwable.getMessage();
-    }
-
-    @Override
-    public String test2() {
-        return "test2调用错误:" + throwable.getMessage();
-    }
-}
-
-@Component
-public class DemoServiceFallbackFactory implements FallbackFactory<DemoServiceFallback> {
-    @Override
-    public DemoServiceFallback create(Throwable throwable) {
-        return new DemoServiceFallback(throwable);
-    }
-}
+feign:
+  sentinel:
+    enabled: true
 ```
-    通过DemoServiceFallbackFactory注册和DemoServiceFallback实现异常处理
+    如果sentinel与服务不在同一台机器下，
+    务必配置 client-ip: 192.168.193.31 , 否则无法监控相关服务
+    进入浏览器控制台可以进行配置
+    http://192.168.193.30:8081/
+    进入控制台配置，内容较简单，自行探索
