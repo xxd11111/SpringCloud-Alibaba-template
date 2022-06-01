@@ -14,7 +14,7 @@
     <artifactId>x03-sentinel</artifactId>
 
     <modules>
-        <module>server-consumer</module>
+        <module>sentinel</module>
     </modules>
 
     <properties>
